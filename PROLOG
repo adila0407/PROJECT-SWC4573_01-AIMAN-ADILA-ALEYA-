@@ -1,148 +1,204 @@
-% PROJECT FACTS (ProjectID, Category, InnovationScore)
-project(pr100, computerScience, 97).
-project(pr101, cyberSecurity, 71).
-project(pr102, artificialIntelligence, 85).
-project(pr103, informationSystem, 88).
-project(pr104, animation, 90).
+% PROJECT FACTS
+% project(ProjectID, Category, Score)
+project(p001, artificial_intelligence, 87).
+project(p002, cybersecurity, 80).
+project(p003, iot, 85).
+project(p004, web_development, 88).
+project(p005, data_science, 90).
 
-% JUDGE FACTS (JudgeID, ExpertiseCategory)
-judge(j1, computerScience).
-judge(j2, cyberSecurity).
-judge(j3, artificialIntelligence).
-judge(j4, informationSystem).
-judge(j5, animation).
+% JUDGE FACTS
+% judge(JudgeID, ExpertiseCategory)
+judge(j1, artificial_intelligence).
+judge(j2, cybersecurity).
+judge(j3, iot).
+judge(j4, web_development).
+judge(j5, data_science).
 
-% BOOTH FACTS (BoothNumber, Category)
-booth(b00, artificialIntelligence).
-booth(b01, informationSystem).
-booth(b02, cyberSecurity).
-booth(b03, animation).
-booth(b04, computerScience).
+% BOOTH FACTS
+% booth(BoothNumber, Category)
+booth(b00, artificial_intelligence).
+booth(b01, cybersecurity).
+booth(b02, iot).
+booth(b03, web_development).
+booth(b04, data_science).
 
 % CONFLICT OF INTEREST
-conflict_of_interest(j2, pr101).
+conflict_of_interest(j1, p001).
 
 % ELIGIBLE AWARD CATEGORIES
-eligible_award_category(computerScience).
-eligible_award_category(cyberSecurity).
-eligible_award_category(artificialIntelligence).
-eligible_award_category(informationSystem).
-eligible_award_category(animation).
+eligible_award_category(artificial_intelligence).
+eligible_award_category(cybersecurity).
+eligible_award_category(iot).
+eligible_award_category(web_development).
+eligible_award_category(data_science).
 
 % RULES
-qualified_judge(JudgeID, ProjectID) :-
-    judge(JudgeID, Category),
-    project(ProjectID, Category, _).
+% Judge and project have the same category
+qualified_judge(Judge, Project) :-
+    judge(Judge, Category),
+    project(Project, Category, _).
 
-valid_booth_assignment(ProjectID, BoothNumber) :-
-    project(ProjectID, Category, _),
-    booth(BoothNumber, Category).
 
-can_evaluate(JudgeID, ProjectID) :-
-    qualified_judge(JudgeID, ProjectID),
-    \+ conflict_of_interest(JudgeID, ProjectID).
+% Project and booth have the same category
+valid_booth(Project, Booth) :-
+    project(Project, Category, _),
+    booth(Booth, Category).
 
-eligible_for_best_innovation(ProjectID) :-
-    project(ProjectID, Category, Score),
+
+% Judge can evaluate if there is no conflict
+can_evaluate(Judge, Project) :-
+    qualified_judge(Judge, Project),
+    \+ conflict_of_interest(Judge, Project).
+
+
+% Project is eligible for Best Innovation
+% if score is greater than 85
+eligible_project(Project) :-
+    project(Project, Category, Score),
     Score > 85,
     eligible_award_category(Category).
 
 
+% ==========================================
 % MAIN PROGRAM
+% ==========================================
+
 :- initialization(main).
+
 main :-
-    nl, write('===================================================='), nl,
-    write('        PROJECT ALLOCATION & JUDGING SYSTEM             '), nl,
-    write('===================================================='), nl, nl,
-    
-    display_matching_eligibility,
-    display_booth_allocation,
-    display_award_eligibility,
-    display_conflict_resolution,
-    
+    nl,
+    write('=================================================='), nl,
+    write('       PROJECT ALLOCATION & JUDGING SYSTEM'), nl,
+    write('=================================================='), nl,
+    nl,
+
+    matching,
+    booths,
+    awards,
+    conflicts,
+
     halt.
 
-% Matching & Eligibility
-display_matching_eligibility :-
-    write('Matching & Eligibility'), nl,
-    write('-------------------------------------------------------------------'), nl,
-    write('Project     | Judge  | Category                | Status'), nl,
-    write('------------------------------------------------------------------'), nl,
+
+% ==========================================
+% MATCHING & ELIGIBILITY TABLE
+% ==========================================
+
+matching :-
+    write('MATCHING & ELIGIBILITY'), nl,
+    write('--------------------------------------------------'), nl,
+    write('Project | Judge | Status'), nl,
+    write('--------------------------------------------------'), nl,
+
     forall(
-        qualified_judge(JudgeID, ProjectID),
+        qualified_judge(Judge, Project),
         (
-            project(ProjectID, Category, _),
-            ( can_evaluate(JudgeID, ProjectID) ->
-                Status = 'Eligible'
-            ;
-                Status = 'Disqualified (Conflict)'
+            project(Project, Category, _),
+
+            write(Project),
+            write('    | '),
+            write(Judge),
+            write('    | '),
+
+            (
+                can_evaluate(Judge, Project)
+                ->
+                write('Eligible')
+                ;
+                write('Conflict')
             ),
-            write(ProjectID), write('       | '),
-            write(JudgeID), write('     | '),
-            write(Category), write('           | '),
-            write(Status), nl
+
+            nl
         )
     ),
+
     nl.
 
-% Booth Allocation Table
-display_booth_allocation :-
-    write(' Booth Allocation'), nl,
-    write('------------------------------------------------------------'), nl,
-    write('Project   | Booth  | Category'), nl,
-    write('------------------------------------------------------------'), nl,
+
+% ==========================================
+% BOOTH ALLOCATION TABLE
+% ==========================================
+
+booths :-
+    write('BOOTH ALLOCATION'), nl,
+    write('--------------------------------------------------'), nl,
+    write('Project | Booth'), nl,
+    write('--------------------------------------------------'), nl,
+
     forall(
-        valid_booth_assignment(ProjectID, BoothNumber),
+        valid_booth(Project, Booth),
         (
-            project(ProjectID, Category, _),
-            write(ProjectID), write('     | '),
-            write(BoothNumber), write('    | '),
-            write(Category), nl
+            write(Project),
+            write('    | '),
+            write(Booth),
+            nl
         )
     ),
+
     nl.
 
-% Award Eligibility Table
-display_award_eligibility :-
-    write('Award Eligibility'), nl,
-    write('------------------------------------------------------------'), nl,
-    write('Project   | Category               | Score   | Award Status'), nl,
-    write('------------------------------------------------------------'), nl,
+
+% ==========================================
+% AWARD ELIGIBILITY TABLE
+% ==========================================
+
+awards :-
+    write('BEST INNOVATION AWARD'), nl,
+    write('--------------------------------------------------'), nl,
+    write('Project | Score | Award Status'), nl,
+    write('--------------------------------------------------'), nl,
+
     forall(
-        project(ProjectID, Category, Score),
+        project(Project, _, Score),
         (
-            ( eligible_for_best_innovation(ProjectID) ->
-                Status = 'Eligible'
-            ;
-                Status = 'Ineligible'
+            write(Project),
+            write('    | '),
+            write(Score),
+            write('    | '),
+
+            (
+                eligible_project(Project)
+                ->
+                write('Eligible')
+                ;
+                write('Not Eligible')
             ),
-            write(ProjectID), write('     | '),
-            write(Category), write('            | '),
-            write(Score), write('         | '),
-            write(Status), nl
+
+            nl
         )
     ),
+
     nl.
 
-% Conflict Resolution Table
-display_conflict_resolution :-
-    write('Conflict Resolution'), nl,
-    write('------------------------------------------------------------'), nl,
-    write('Judge  | Project   | Category               | Result'), nl,
-    write('------------------------------------------------------------'), nl,
+
+% ==========================================
+% CONFLICT CHECK TABLE
+% ==========================================
+
+conflicts :-
+    write('CONFLICT CHECK'), nl,
+    write('--------------------------------------------------'), nl,
+    write('Judge | Project | Result'), nl,
+    write('--------------------------------------------------'), nl,
+
     forall(
-        qualified_judge(JudgeID, ProjectID),
+        qualified_judge(Judge, Project),
         (
-            project(ProjectID, Category, _),
-            ( conflict_of_interest(JudgeID, ProjectID) ->
-                Result = 'Conflict Found'
-            ;
-                Result = 'No Conflict'
+            write(Judge),
+            write('   | '),
+            write(Project),
+            write('    | '),
+
+            (
+                conflict_of_interest(Judge, Project)
+                ->
+                write('Conflict Found')
+                ;
+                write('No Conflict')
             ),
-            write(JudgeID), write('     | '),
-            write(ProjectID), write('     | '),
-            write(Category), write('     | '),
-            write(Result), nl
+
+            nl
         )
     ),
+
     nl.
