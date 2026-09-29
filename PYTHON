@@ -1,0 +1,253 @@
+# Part C: Multi-Paradigm Programming (Python)
+# Innovation Day Showcase - Interactive Showcase Platform
+
+import pandas as pd
+from functools import reduce
+
+
+# ---------------------------------------------------------
+# Object-Oriented Programming
+# ---------------------------------------------------------
+
+class InnovationProject:
+
+    def __init__(self, project_id, title, category, team_members, scores):
+        self.project_id = project_id
+        self.title = title
+        self.category = category
+        self.team_members = team_members
+        self.scores = scores
+
+    def calculate_average(self):
+        if not self.scores:
+            return 0
+
+        return sum(self.scores) / len(self.scores)
+
+    def predict_commercialization(self):
+
+        average = self.calculate_average()
+
+        if average >= 85:
+            return "High"
+
+        elif average >= 70:
+            return "Medium"
+
+        else:
+            return "Low"
+
+    def display_project(self):
+
+        print("Project ID       :", self.project_id)
+        print("Title            :", self.title)
+        print("Category         :", self.category)
+        print("Team Members     :", ", ".join(self.team_members))
+        print("Scores           :", self.scores)
+        print("Average Score    :", round(self.calculate_average(), 2))
+        print("Commercialization:", self.predict_commercialization())
+        print()
+
+
+# ---------------------------------------------------------
+# Project Data
+# Same scores and categories as Part B
+# ---------------------------------------------------------
+
+projects = [
+
+    InnovationProject(
+        "P001",
+        "Smart Campus System",
+        "Artificial Intelligence",
+        ["Aiman", "Adila"],
+        [85, 88, 90]
+    ),
+
+    InnovationProject(
+        "P002",
+        "Eco Waste Monitor",
+        "Cybersecurity",
+        ["Aleya", "Aiman"],
+        [78, 82, 80]
+    ),
+
+    InnovationProject(
+        "P003",
+        "Health Assistant App",
+        "IoT",
+        ["Adila", "Aleya"],
+        [92, 90, 95]
+    ),
+
+    InnovationProject(
+        "P004",
+        "Smart Farming System",
+        "Web Development",
+        ["Aiman", "Aleya"],
+        [75, 79, 77]
+    ),
+
+    InnovationProject(
+        "P005",
+        "Data Science Project",
+        "Data Science",
+        ["Aiman", "Aleya"],
+        [88, 86, 89]
+    )
+]
+
+
+# ---------------------------------------------------------
+# Functional Programming
+# ---------------------------------------------------------
+
+average_scores = list(
+    map(
+        lambda project: project.calculate_average(),
+        projects
+    )
+)
+
+print("===== PROJECT AVERAGES =====")
+
+for project, average in zip(projects, average_scores):
+
+    print(
+        project.project_id,
+        "-",
+        project.title,
+        ":",
+        round(average, 2)
+    )
+
+print()
+
+
+# ---------------------------------------------------------
+# Final Pitching Round
+# Average score >= 80
+# ---------------------------------------------------------
+
+top_projects = list(
+    filter(
+        lambda project: project.calculate_average() >= 80,
+        projects
+    )
+)
+
+
+print("===== FINAL PITCHING ROUND =====")
+
+for project in top_projects:
+
+    print(
+        project.project_id,
+        "-",
+        project.title,
+        ":",
+        round(project.calculate_average(), 2)
+    )
+
+print()
+
+# ---------------------------------------------------------
+# Winning Project
+# ---------------------------------------------------------
+
+winning_project = reduce(
+    lambda project1, project2:
+        project1
+        if project1.calculate_average()
+        >= project2.calculate_average()
+        else project2,
+    projects
+)
+
+
+print("===== WINNING PROJECT =====")
+
+print("Project ID :", winning_project.project_id)
+print("Title      :", winning_project.title)
+print("Category   :", winning_project.category)
+print("Average    :", round(
+    winning_project.calculate_average(), 2
+))
+
+print()
+
+# ---------------------------------------------------------
+# Commercialization Prediction
+# ---------------------------------------------------------
+
+print("===== COMMERCIALIZATION PREDICTION =====")
+
+for project in projects:
+
+    print(
+        project.project_id,
+        "-",
+        project.title,
+        ":",
+        project.predict_commercialization()
+    )
+
+print()
+
+# ---------------------------------------------------------
+# Pandas Library Integration
+# ---------------------------------------------------------
+
+data = {
+
+    "Project ID": [
+        project.project_id
+        for project in projects
+    ],
+
+    "Project Title": [
+        project.title
+        for project in projects
+    ],
+
+    "Category": [
+        project.category
+        for project in projects
+    ],
+
+    "Average Score": [
+        project.calculate_average()
+        for project in projects
+    ],
+
+    "Commercialization": [
+        project.predict_commercialization()
+        for project in projects
+    ]
+}
+
+df = pd.DataFrame(data)
+
+
+print("===== STATISTICAL REPORT =====")
+
+print(df)
+
+print()
+
+print(
+    "Overall Average Score:",
+    round(df["Average Score"].mean(), 2)
+)
+
+print()
+
+# ---------------------------------------------------------
+# Complete Project Information
+# ---------------------------------------------------------
+
+print("===== PROJECT DETAILS =====")
+
+for project in projects:
+
+    project.display_project()
