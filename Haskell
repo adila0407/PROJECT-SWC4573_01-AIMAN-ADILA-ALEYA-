@@ -1,0 +1,67 @@
+data Project = Project
+    { projectID :: String
+    , category  :: String
+    , scores    :: [Double]
+    } deriving (Show)
+
+calculateAverage :: [Double] -> Double
+calculateAverage [] = 0
+calculateAverage xs = total xs / fromIntegral (count xs)
+  where
+    total [] = 0
+    total (x:xs) = x + total xs
+
+    count [] = 0
+    count (_:xs) = 1 + count xs
+
+projectAverage :: Project -> Double
+projectAverage project = calculateAverage (scores project)
+
+qualifiedProjects :: Double -> [Project] -> [Project]
+qualifiedProjects threshold projects =
+    filter (\p -> projectAverage p >= threshold) projects
+
+winningProject :: [Project] -> Project
+winningProject [p] = p
+winningProject (p:ps)
+    | projectAverage p >= projectAverage best = p
+    | otherwise = best
+  where
+    best = winningProject ps
+
+displayProject :: Project -> String
+displayProject p =
+    "Project ID: " ++ projectID p ++
+    ", Category: " ++ category p ++
+    ", Average: " ++ show (projectAverage p)
+
+main :: IO ()
+main = do
+
+    let projects =
+            [ Project "P001" "Artificial Intelligence" [85, 88, 90]
+            , Project "P002" "Cybersecurity" [78, 82, 80]
+            , Project "P003" "IoT" [92, 90, 95]
+            , Project "P004" "Web Development" [75, 79, 77]
+            , Project "P005" "Data Science" [88, 86, 89]
+            ]
+
+    putStrLn "=== INNOVATION SCORE ANALYTICS ==="
+    putStrLn ""
+
+    putStrLn "Project Scores:"
+    mapM_ (putStrLn . displayProject) projects
+
+    putStrLn ""
+    putStrLn "=== FINAL PITCHING ROUND ==="
+
+    let qualified = qualifiedProjects 80 projects
+
+    mapM_ (putStrLn . displayProject) qualified
+
+    putStrLn ""
+    putStrLn "=== OVERALL WINNER ==="
+
+    let winner = winningProject projects
+
+    putStrLn (displayProject winner)
