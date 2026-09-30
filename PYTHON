@@ -1,8 +1,5 @@
-# Part C: Multi-Paradigm Programming (Python)
-# Innovation Day Showcase - Interactive Showcase Platform
-
 import pandas as pd
-from functools import reduce
+import matplotlib.pyplot as plt
 
 
 # ---------------------------------------------------------
@@ -10,108 +7,101 @@ from functools import reduce
 # ---------------------------------------------------------
 
 class InnovationProject:
+  def __init__(self, project_id: str, title: str, category: str,
+               team_members: list, scores: list):
+    self.project_id = project_id
+    self.title = title
+    self.category = category
+    self.team_members = team_members
+    self.scores = scores
 
-    def __init__(self, project_id, title, category, team_members, scores):
-        self.project_id = project_id
-        self.title = title
-        self.category = category
-        self.team_members = team_members
-        self.scores = scores
+  def calculate_average(self) -> float:
+    return sum(self.scores) / len(self.scores)
 
-    def calculate_average(self):
-        if not self.scores:
-            return 0
+  def predict_commercialization(self) -> str:
+    average = self.calculate_average()
 
-        return sum(self.scores) / len(self.scores)
-
-    def predict_commercialization(self):
-
-        average = self.calculate_average()
-
-        if average >= 85:
-            return "High"
-
-        elif average >= 70:
-            return "Medium"
-
-        else:
-            return "Low"
-
-    def display_project(self):
-
-        print("Project ID       :", self.project_id)
-        print("Title            :", self.title)
-        print("Category         :", self.category)
-        print("Team Members     :", ", ".join(self.team_members))
-        print("Scores           :", self.scores)
-        print("Average Score    :", round(self.calculate_average(), 2))
-        print("Commercialization:", self.predict_commercialization())
-        print()
+    if average >= 85:
+      return "High"
+    elif average >= 70:
+      return "Medium"
+    else:
+      return "Low"
 
 
 # ---------------------------------------------------------
 # Project Data
-# Same scores and categories as Part B
+# Same category and scores as Part B
 # ---------------------------------------------------------
 
-projects = [
-
-    InnovationProject(
+project_list = [
+      InnovationProject(
         "P001",
         "Smart Campus System",
         "Artificial Intelligence",
         ["Aiman", "Adila"],
         [85, 88, 90]
-    ),
+      ),
 
-    InnovationProject(
+      InnovationProject(
         "P002",
         "Eco Waste Monitor",
         "Cybersecurity",
         ["Aleya", "Aiman"],
         [78, 82, 80]
-    ),
+      ),
 
-    InnovationProject(
+      InnovationProject(
         "P003",
         "Health Assistant App",
         "IoT",
         ["Adila", "Aleya"],
         [92, 90, 95]
-    ),
+      ),
 
-    InnovationProject(
+      InnovationProject(
         "P004",
         "Smart Farming System",
         "Web Development",
         ["Aiman", "Aleya"],
         [75, 79, 77]
-    ),
+      ),
 
-    InnovationProject(
+      InnovationProject(
         "P005",
         "Data Science Project",
         "Data Science",
         ["Aiman", "Aleya"],
         [88, 86, 89]
-    )
+      )
 ]
 
 
 # ---------------------------------------------------------
-# Functional Programming
+# Functional Features
 # ---------------------------------------------------------
 
 average_scores = list(
-    map(
-        lambda project: project.calculate_average(),
-        projects
-    )
+    map(lambda p: p.calculate_average(), project_list)
 )
+
+top_projects = list(
+    filter(lambda p: p.calculate_average() >= 80, project_list)
+)
+
+winning_project = max(
+    project_list,
+    key=lambda p: p.calculate_average()
+)
+
+
+# ---------------------------------------------------------
+# Project Averages
+# ---------------------------------------------------------
 
 print("===== PROJECT AVERAGES =====")
 
-for project, average in zip(projects, average_scores):
+for project, average in zip(project_list, average_scores):
 
     print(
         project.project_id,
@@ -121,22 +111,12 @@ for project, average in zip(projects, average_scores):
         round(average, 2)
     )
 
-print()
-
 
 # ---------------------------------------------------------
 # Final Pitching Round
-# Average score >= 80
 # ---------------------------------------------------------
 
-top_projects = list(
-    filter(
-        lambda project: project.calculate_average() >= 80,
-        projects
-    )
-)
-
-
+print()
 print("===== FINAL PITCHING ROUND =====")
 
 for project in top_projects:
@@ -149,40 +129,31 @@ for project in top_projects:
         round(project.calculate_average(), 2)
     )
 
-print()
 
 # ---------------------------------------------------------
 # Winning Project
 # ---------------------------------------------------------
 
-winning_project = reduce(
-    lambda project1, project2:
-        project1
-        if project1.calculate_average()
-        >= project2.calculate_average()
-        else project2,
-    projects
-)
-
-
+print()
 print("===== WINNING PROJECT =====")
 
 print("Project ID :", winning_project.project_id)
 print("Title      :", winning_project.title)
 print("Category   :", winning_project.category)
-print("Average    :", round(
-    winning_project.calculate_average(), 2
-))
+print(
+    "Average    :",
+    round(winning_project.calculate_average(), 2)
+)
 
-print()
 
 # ---------------------------------------------------------
 # Commercialization Prediction
 # ---------------------------------------------------------
 
+print()
 print("===== COMMERCIALIZATION PREDICTION =====")
 
-for project in projects:
+for project in project_list:
 
     print(
         project.project_id,
@@ -192,43 +163,26 @@ for project in projects:
         project.predict_commercialization()
     )
 
-print()
 
 # ---------------------------------------------------------
-# Pandas Library Integration
+# Pandas Statistical Report
 # ---------------------------------------------------------
 
 data = {
-
-    "Project ID": [
-        project.project_id
-        for project in projects
-    ],
-
-    "Project Title": [
-        project.title
-        for project in projects
-    ],
-
-    "Category": [
-        project.category
-        for project in projects
-    ],
-
-    "Average Score": [
-        project.calculate_average()
-        for project in projects
-    ],
-
+    "Project ID": [p.project_id for p in project_list],
+    "Project Title": [p.title for p in project_list],
+    "Category": [p.category for p in project_list],
+    "Average Score": [p.calculate_average() for p in project_list],
     "Commercialization": [
-        project.predict_commercialization()
-        for project in projects
+        p.predict_commercialization()
+        for p in project_list
     ]
 }
 
 df = pd.DataFrame(data)
 
 
+print()
 print("===== STATISTICAL REPORT =====")
 
 print(df)
@@ -240,14 +194,39 @@ print(
     round(df["Average Score"].mean(), 2)
 )
 
+
+# ---------------------------------------------------------
+# Project Details
+# ---------------------------------------------------------
+
 print()
-
-# ---------------------------------------------------------
-# Complete Project Information
-# ---------------------------------------------------------
-
 print("===== PROJECT DETAILS =====")
 
-for project in projects:
+for project in project_list:
 
-    project.display_project()
+    print("Project ID       :", project.project_id)
+    print("Title            :", project.title)
+    print("Category         :", project.category)
+    print("Team Members     :", ", ".join(project.team_members))
+    print("Scores           :", project.scores)
+    print("Average Score    :", round(project.calculate_average(), 2))
+    print(
+        "Commercialization:",
+        project.predict_commercialization()
+    )
+    print()
+
+
+# ---------------------------------------------------------
+# Matplotlib Bar Chart
+# ---------------------------------------------------------
+
+plt.bar(df["Project ID"], df["Average Score"])
+
+plt.title("Innovation Project Average Scores")
+plt.xlabel("Project ID")
+plt.ylabel("Average Score")
+
+plt.ylim(0, 100)
+
+plt.show()
